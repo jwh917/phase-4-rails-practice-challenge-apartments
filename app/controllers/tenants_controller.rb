@@ -1,0 +1,45 @@
+class TenantsController < ApplicationController
+  rescue_from ActiveRecord::RecordNotFound, with: :render_not_found_response
+
+  def index
+    tenants = Tenant.all
+    render json: tenants
+  end
+
+  def show
+    tenant = find_tnt
+    render json: tenant
+  end
+
+  def create
+    tenant = Tenant.create(tnt_params)
+    render json: tenant, status: :created
+  end
+
+  def update
+    tenant = find_tnt
+    tenant.update(tnt_params)
+    render json: tenant
+  end 
+
+  def destroy
+    tenant = find_tnt
+    tenant.destroy
+    head :no_content
+  end
+
+  private
+
+  def find_tnt
+    Tenant.find_by(id: params[:id])
+  end
+
+  def tnt_params
+    params.permit(:name, :age)
+  end
+
+  def render_not_found_response
+    render json: { error: "Tenant not found" }, status: :not_found
+  end
+
+end
